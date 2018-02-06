@@ -6,7 +6,6 @@ typings
 npm-debug.log
 
 # Build files
-dist
 dist_test
 .nyc_output
 node_modules
