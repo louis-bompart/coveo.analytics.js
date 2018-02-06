@@ -17,7 +17,6 @@ module.exports = {
     },
     plugins:[
         new webpack.ProvidePlugin({
-            'Promise': 'exports?global.Promise!es6-promise/auto',
             'fetch': 'exports?self.fetch!whatwg-fetch'
         }),
         new webpack.optimize.UglifyJsPlugin()
