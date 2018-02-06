@@ -7,7 +7,7 @@ typings
 npm-debug.log
 
 # Build files
-dist
-dist_test
+# dist commented to get buildfiles.
+dist_test 
 .nyc_output
 node_modules
