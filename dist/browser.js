@@ -1,6 +1,10 @@
 "use strict";
 var simpleanalytics_1 = require('./simpleanalytics');
 var analytics = require('./index');
+var promise = window['Promise'];
+if (!(promise instanceof Function)) {
+    require('es6-promise').polyfill();
+}
 var coveoua = global.coveoua || {};
 global.coveoua = simpleanalytics_1.default;
 global.coveoanalytics = analytics;
