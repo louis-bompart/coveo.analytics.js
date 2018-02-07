@@ -5,6 +5,8 @@ var promise = window['Promise'];
 if (!(promise instanceof Function)) {
     require('es6-promise').polyfill();
 }
+var promiseshim_1 = require('./promiseshim');
+promiseshim_1.shim();
 var coveoua = global.coveoua || {};
 global.coveoua = simpleanalytics_1.default;
 global.coveoanalytics = analytics;
