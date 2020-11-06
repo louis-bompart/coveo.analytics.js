@@ -1,0 +1,51 @@
+<html>
+<script>
+(function(c,o,v,e,O,u,a){
+a='coveoua';c[a]=c[a]||function(){(c[a].q=c[a].q|| []).push(arguments)};
+c[a].t=Date.now();u=o.createElement(v);u.async=1;u.src=e;
+O=o.getElementsByTagName(v)[0];O.parentNode.insertBefore(u,O)
+})(window,document,'script','coveoua.js')
+
+// Replace YOUR-TOKEN with your real token
+// (eg: an API key which has the rights to write into Coveo UsageAnalytics)
+coveoua('init','YOUR-TOKEN');
+
+coveoua('sv:setAction', 'ticket_create_start')
+coveoua('send', 'event');
+
+coveoua('sv:setTicket', {subject: "super subject", description: 'some description', category: 'some category', custom: { "verycustom": "value" }});
+coveoua('sv:setAction', 'ticket_cancel')
+coveoua('send', 'event');
+
+coveoua('sv:setTicket', {subject: "super subject", description: 'some description', category: 'some category', custom: { "verycustom": "value" }});
+coveoua('sv:setAction', 'ticket_create')
+coveoua('send', 'event');
+
+coveoua('sv:setAction', 'ticket_classification_click', {classificationId: 'someId'})
+coveoua('send', 'event');
+
+coveoua('sv:setAction', 'phone_number_click', {phoneNumber: '18003434343'})
+coveoua('send', 'event');
+
+coveoua('send', "pageview", "/firstpage");
+
+setTimeout(function() {
+    coveoua('sv:setAction', 'login', {hashedEmail: 'aasd90asd98asd'})
+    coveoua('send', 'event');
+    coveoua('send', "pageview", "/secondpage");
+}, 1000);
+
+function testBeacon() {
+    coveoua('sv:setAction', 'ticket_create_start')
+    coveoua('send', 'event');
+    coveoua('sv:setTicket', {subject: "super subject", description: 'some description', category: 'some category', custom: { "verycustom": "value" }});
+    coveoua('sv:setAction', 'ticket_field_updated')
+    coveoua('send', 'event');
+    window.location = "index.html?added=" + new Date().valueOf();
+}
+</script>
+
+<body>
+    <button onclick="testBeacon()">Test beacon</button>
+</body>
+</html>
