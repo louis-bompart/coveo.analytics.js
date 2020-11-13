@@ -178,7 +178,9 @@ export class CoveoAnalyticsClient implements AnalyticsClient, VisitorIdProvider 
         const processMeasurementProtocolConversionStep: ProcessPayloadStep = (currentPayload) =>
             usesMeasurementProtocol ? convertKeysToMeasurementProtocol(currentPayload) : currentPayload;
         const removeUnknownParameters: ProcessPayloadStep = (currentPayload) =>
-            (usesMeasurementProtocol && removeUnknownKeys) ? this.removeUnknownParameters(currentPayload) : currentPayload;
+            usesMeasurementProtocol && removeUnknownKeys
+                ? this.removeUnknownParameters(currentPayload)
+                : currentPayload;
         const processCustomParameters: ProcessPayloadStep = (currentPayload) =>
             usesMeasurementProtocol ? this.processCustomParameters(currentPayload) : currentPayload;
 
@@ -267,7 +269,7 @@ export class CoveoAnalyticsClient implements AnalyticsClient, VisitorIdProvider 
 
     addEventTypeMapping(eventType: string, eventConfig: EventTypeConfig): void {
         this.eventTypeMapping[eventType] = eventConfig;
-    } 
+    }
 
     private parseVariableArgumentsPayload(fieldsOrder: string[], payload: VariableArgumentsPayload) {
         const parsedArguments: {[name: string]: any} = {};

@@ -50,9 +50,7 @@ describe('SV plugin', () => {
 
             const result = executeRegisteredHook(SVPluginEventTypes.pageview, {});
 
-            expect(result).toEqual({...defaultResult, 
-                                       hitType: SVPluginEventTypes.pageview, 
-                                       subject: 'Some Subject'});
+            expect(result).toEqual({...defaultResult, hitType: SVPluginEventTypes.pageview, subject: 'Some Subject'});
         });
 
         it('should not append the product with a random event type', () => {
@@ -75,19 +73,24 @@ describe('SV plugin', () => {
         });
 
         it('should convert known ticket keys into the measurement protocol format', () => {
-            sv.setTicket({subject: '🧀', 
-                          description: 'description', 
-                          category: 'category',
-                          productId: 'PR123',
-                          ticketId: 'TKABC'});
+            sv.setTicket({
+                subject: '🧀',
+                description: 'description',
+                category: 'category',
+                productId: 'PR123',
+                ticketId: 'TKABC',
+            });
 
             const result = executeRegisteredHook(SVPluginEventTypes.event, {});
 
-            expect(result).toEqual({...defaultResult, subject: '🧀', 
-                                                      description: 'description',
-                                                      category: 'category',
-                                                      productId: 'PR123',
-                                                      ticketId: 'TKABC'});
+            expect(result).toEqual({
+                ...defaultResult,
+                subject: '🧀',
+                description: 'description',
+                category: 'category',
+                productId: 'PR123',
+                ticketId: 'TKABC',
+            });
         });
 
         it('should keep custom metadata in the ticket', () => {
@@ -229,10 +232,10 @@ describe('SV plugin', () => {
 
                 const anImpression = {
                     name: 'An impression with a too small position',
-                    position: 0
+                    position: 0,
                 };
 
-                sv.addImpression(anImpression)
+                sv.addImpression(anImpression);
 
                 expect(console.warn).not.toHaveBeenCalled();
 
@@ -249,7 +252,7 @@ describe('SV plugin', () => {
 
                 sv.addImpression({
                     name: 'An impression with a too small position',
-                    position: 0
+                    position: 0,
                 });
 
                 const result = executeRegisteredHook(SVPluginEventTypes.event, {});
@@ -276,10 +279,12 @@ describe('SV plugin', () => {
 
                 executeRegisteredHook(SVPluginEventTypes.event, {});
 
-                expect(console.warn).toHaveBeenNthCalledWith(1,
+                expect(console.warn).toHaveBeenNthCalledWith(
+                    1,
                     `The position for impression '${anImpressionWithANameAndId.name}' must be greater than 0 when provided.`
                 );
-                expect(console.warn).toHaveBeenNthCalledWith(2,
+                expect(console.warn).toHaveBeenNthCalledWith(
+                    2,
                     `The position for impression '${anImpressionWithOnlyAnId.id}' must be greater than 0 when provided.`
                 );
             });
@@ -294,7 +299,7 @@ describe('SV plugin', () => {
                 const undefinedPosition = undefined as any;
                 sv.addImpression({
                     name: 'An impression with an undefined position',
-                    position: undefinedPosition
+                    position: undefinedPosition,
                 });
 
                 const result = executeRegisteredHook(SVPluginEventTypes.event, {});

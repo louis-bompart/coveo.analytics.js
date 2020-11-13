@@ -2,9 +2,7 @@ import {AnalyticsClient} from '../client/analytics';
 import {EventType} from '../events';
 import {uuidv4} from '../client/crypto';
 import {getFormattedLocation} from '../client/location';
-import {
-    convertImpressionListToMeasurementProtocol,
-} from '../client/measurementProtocolMapper';
+import {convertImpressionListToMeasurementProtocol} from '../client/measurementProtocolMapper';
 
 export const SVPluginEventTypes = {
     pageview: 'pageview',
@@ -28,7 +26,7 @@ export interface TicketProperties {
     custom?: CustomValues;
 }
 
-export type Ticket = TicketProperties
+export type Ticket = TicketProperties;
 
 export interface ImpressionProperties {
     id?: string;
@@ -38,7 +36,7 @@ export interface ImpressionProperties {
     custom?: CustomValues;
 }
 
-export type Impression = ImpressionProperties
+export type Impression = ImpressionProperties;
 export type BaseImpression = Omit<Impression, 'list'>;
 export interface ImpressionList {
     listName?: string;
@@ -143,11 +141,15 @@ export class SV {
     private getImpressionPayload() {
         const impressionsByList = this.getImpressionsByList();
         return impressionsByList
-            .map(({impressions, ...rest}) => ({
-                ...rest,
-                impressions: impressions
-                    .map((baseImpression) => this.assureBaseImpressionValidity(baseImpression))
-            }) as ImpressionList)
+            .map(
+                ({impressions, ...rest}) =>
+                    ({
+                        ...rest,
+                        impressions: impressions.map((baseImpression) =>
+                            this.assureBaseImpressionValidity(baseImpression)
+                        ),
+                    } as ImpressionList)
+            )
             .reduce((newPayload, impressionList, index) => {
                 return {
                     ...newPayload,
@@ -159,8 +161,10 @@ export class SV {
     private assureBaseImpressionValidity(baseImpression: BaseImpression) {
         const {position, ...baseImpressionRest} = baseImpression;
         if (position !== undefined && position < 1) {
-            console.warn(`The position for impression '${baseImpression.name || baseImpression.id}'`
-                + ` must be greater than 0 when provided.`);
+            console.warn(
+                `The position for impression '${baseImpression.name || baseImpression.id}'` +
+                    ` must be greater than 0 when provided.`
+            );
 
             return baseImpressionRest;
         }
@@ -189,11 +193,7 @@ export class SV {
 
         if (!!payload.page) {
             const removeStartingSlash = (page: string) => page.replace(/^\/?(.*)$/, '/$1');
-            const extractHostnamePart = (location: string) =>
-                location
-                    .split('/')
-                    .slice(0, 3)
-                    .join('/');
+            const extractHostnamePart = (location: string) => location.split('/').slice(0, 3).join('/');
             this.lastLocation = `${extractHostnamePart(this.lastLocation)}${removeStartingSlash(payload.page)}`;
         } else {
             this.lastLocation = getFormattedLocation(window.location);

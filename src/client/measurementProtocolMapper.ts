@@ -105,7 +105,11 @@ export const convertProductToMeasurementProtocol = (product: Product, index: num
     }, {});
 };
 
-export const convertImpressionListToMeasurementProtocol = (impressionList: ImpressionList, listIndex: number, prefix: string) => {
+export const convertImpressionListToMeasurementProtocol = (
+    impressionList: ImpressionList,
+    listIndex: number,
+    prefix: string
+) => {
     const payload: {[name: string]: any} = impressionList.impressions.reduce(
         (mappedImpressions, impression, productIndex) => {
             return {
@@ -127,7 +131,7 @@ const convertImpressionToMeasurementProtocol = (
     impression: BaseImpression,
     listIndex: number,
     productIndex: number,
-    prefix: string,
+    prefix: string
 ) => {
     return keysOf(impression).reduce((mappedImpression, key) => {
         const newKey = `il${listIndex + 1}${prefix}${productIndex + 1}${impressionKeysMapping[key] || key}`;
