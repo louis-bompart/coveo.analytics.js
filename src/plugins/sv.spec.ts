@@ -8,9 +8,6 @@ describe('SV plugin', () => {
     const someUUIDGenerator = jest.fn(() => someUUID);
     const someUUID = '13ccebdb-0138-45e8-bf70-884817ead190';
     const defaultResult = {
-        aid: 'com.coveo.service',
-        an: 'Service',
-        av: '0.1',
         pageViewId: someUUID,
         encoding: document.characterSet,
         location: 'http://localhost/',
@@ -90,7 +87,7 @@ describe('SV plugin', () => {
                                                       description: 'description',
                                                       category: 'category',
                                                       productId: 'PR123',
-                                                      ticketid: 'TKABC'});
+                                                      ticketId: 'TKABC'});
         });
 
         it('should keep custom metadata in the ticket', () => {

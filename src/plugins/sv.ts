@@ -116,7 +116,7 @@ export class SV {
     }
 
     private addSVDataToPayload(eventType: string, payload: any) {
-        const ecPayload = {
+        const svPayload = {
             ...this.getLocationInformation(eventType, payload),
             ...this.getDefaultContextInformation(eventType),
             ...(this.action ? {action: this.action} : {}),
@@ -131,7 +131,7 @@ export class SV {
         return {
             ...impressionPayload,
             ...ticketPayload,
-            ...ecPayload,
+            ...svPayload,
             ...payload,
         };
     }
@@ -211,11 +211,6 @@ export class SV {
     }
 
     getDefaultContextInformation(eventType: string) {
-        const applicationContext = {
-            an: 'Service',
-            aid: 'com.coveo.service',
-            av: '0.1'
-        };
         const pageContext = {
             hitType: eventType,
             pageViewId: this.pageViewId,
@@ -237,7 +232,6 @@ export class SV {
             eventId: this.uuidGenerator(),
         };
         return {
-            ...applicationContext,
             ...pageContext,
             ...eventContext,
             ...screenContext,
