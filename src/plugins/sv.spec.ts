@@ -8,9 +8,6 @@ describe('SV plugin', () => {
     const someUUIDGenerator = jest.fn(() => someUUID);
     const someUUID = '13ccebdb-0138-45e8-bf70-884817ead190';
     const defaultResult = {
-        aid: 'com.coveo.service',
-        an: 'Service',
-        av: '0.1',
         pageViewId: someUUID,
         encoding: document.characterSet,
         location: 'http://localhost/',
@@ -78,19 +75,19 @@ describe('SV plugin', () => {
         });
 
         it('should convert known ticket keys into the measurement protocol format', () => {
-            sv.setTicket({subject: '🧀', 
+            sv.setTicket({id: 'TKABC',
+                          subject: '🧀', 
                           description: 'description', 
                           category: 'category',
-                          productId: 'PR123',
-                          ticketId: 'TKABC'});
+                          productId: 'PR123'});
 
             const result = executeRegisteredHook(SVPluginEventTypes.event, {});
 
-            expect(result).toEqual({...defaultResult, subject: '🧀', 
+            expect(result).toEqual({...defaultResult, id: 'TKABC',
+                                                      subject: '🧀', 
                                                       description: 'description',
                                                       category: 'category',
-                                                      productId: 'PR123',
-                                                      ticketid: 'TKABC'});
+                                                      productId: 'PR123'});
         });
 
         it('should keep custom metadata in the ticket', () => {

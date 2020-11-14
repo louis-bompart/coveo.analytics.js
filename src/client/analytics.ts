@@ -50,7 +50,6 @@ export type EventTypeConfig = {
     variableLengthArgumentsNames?: string[];
     addVisitorIdParameter?: boolean;
     usesMeasurementProtocol?: boolean;
-    removeUnknownKeys?: boolean;
 };
 
 export interface AnalyticsClient {
@@ -156,7 +155,6 @@ export class CoveoAnalyticsClient implements AnalyticsClient, VisitorIdProvider 
             variableLengthArgumentsNames = [],
             addVisitorIdParameter = false,
             usesMeasurementProtocol = false,
-            removeUnknownKeys = true,
         } = this.eventTypeMapping[eventType] || {};
 
         type ProcessPayloadStep = (currentPayload: any) => any;
@@ -178,7 +176,7 @@ export class CoveoAnalyticsClient implements AnalyticsClient, VisitorIdProvider 
         const processMeasurementProtocolConversionStep: ProcessPayloadStep = (currentPayload) =>
             usesMeasurementProtocol ? convertKeysToMeasurementProtocol(currentPayload) : currentPayload;
         const removeUnknownParameters: ProcessPayloadStep = (currentPayload) =>
-            (usesMeasurementProtocol && removeUnknownKeys) ? this.removeUnknownParameters(currentPayload) : currentPayload;
+            usesMeasurementProtocol ? this.removeUnknownParameters(currentPayload) : currentPayload;
         const processCustomParameters: ProcessPayloadStep = (currentPayload) =>
             usesMeasurementProtocol ? this.processCustomParameters(currentPayload) : currentPayload;
 
