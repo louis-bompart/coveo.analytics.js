@@ -2,7 +2,10 @@ import {AnalyticsClient} from '../client/analytics';
 import {EventType} from '../events';
 import {uuidv4} from '../client/crypto';
 import {getFormattedLocation} from '../client/location';
-import {convertImpressionListToMeasurementProtocol} from '../client/measurementProtocolMapper';
+import {
+    convertImpressionListToMeasurementProtocol,
+    convertTicketToMeasurementProtocol,
+} from '../client/measurementProtocolMapper';
 
 export const SVPluginEventTypes = {
     pageview: 'pageview',
@@ -19,6 +22,7 @@ export type CustomValues = {
 
 export interface TicketProperties {
     id?: string;
+    provisionalId?: string;
     subject?: string;
     description?: string;
     category?: string;
@@ -67,8 +71,12 @@ export class SV {
         this.addHooksForSVEvents();
     }
 
+    initTicket() {
+        this.ticket.provisionalId = this.uuidGenerator();
+    }
+
     setTicket(ticket: Ticket) {
-        this.ticket = ticket;
+        this.ticket = {...ticket, provisionalId: this.ticket.provisionalId};
     }
 
     addImpression(impression: Impression) {
@@ -81,10 +89,14 @@ export class SV {
     }
 
     clearData() {
-        this.ticket = {};
+        this.ticket = {provisionalId: this.ticket.provisionalId};
         this.impressions = [];
         this.action = undefined;
         this.actionData = {};
+    }
+
+    clearTicket() {
+        this.ticket = {};
     }
 
     private addHooksForSVEvents() {
@@ -121,7 +133,6 @@ export class SV {
 
         const ticketPayload = this.getTicketPayload();
         const impressionPayload = this.getImpressionPayload();
-
         this.clearData();
 
         return {
@@ -133,7 +144,7 @@ export class SV {
     }
 
     private getTicketPayload() {
-        return this.ticket;
+        return convertTicketToMeasurementProtocol(this.ticket);
     }
 
     private getImpressionPayload() {

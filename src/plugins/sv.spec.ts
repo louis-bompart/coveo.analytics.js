@@ -37,12 +37,19 @@ describe('SV plugin', () => {
     });
 
     describe('tickets', () => {
+        it('should set the ticket provisional id when initTicket is called', () => {
+            sv.initTicket();
+
+            const result = executeRegisteredHook(SVPluginEventTypes.event, {});
+            expect(result).toEqual({...defaultResult, ticketProvisionalId: '13ccebdb-0138-45e8-bf70-884817ead190'});
+        });
+
         it('should set the ticket with the specific format when the hook is called', () => {
             sv.setTicket({subject: 'Some Subject'});
 
             const result = executeRegisteredHook(SVPluginEventTypes.event, {});
 
-            expect(result).toEqual({...defaultResult, subject: 'Some Subject'});
+            expect(result).toEqual({...defaultResult, ticketSubject: 'Some Subject'});
         });
 
         it('should append the ticket with the pageview event', () => {
@@ -50,7 +57,7 @@ describe('SV plugin', () => {
 
             const result = executeRegisteredHook(SVPluginEventTypes.pageview, {});
 
-            expect(result).toEqual({...defaultResult, hitType: SVPluginEventTypes.pageview, subject: 'Some Subject'});
+            expect(result).toEqual({...defaultResult, hitType: SVPluginEventTypes.pageview, ticketSubject: 'Some Subject'});
         });
 
         it('should not append the product with a random event type', () => {
@@ -69,7 +76,7 @@ describe('SV plugin', () => {
             executeRegisteredHook('💀', {});
             const result = executeRegisteredHook(SVPluginEventTypes.event, {});
 
-            expect(result).toEqual({...defaultResult, subject: 'Some Subject'});
+            expect(result).toEqual({...defaultResult, ticketSubject: 'Some Subject'});
         });
 
         it('should convert known ticket keys into the measurement protocol format', () => {
@@ -85,11 +92,11 @@ describe('SV plugin', () => {
 
             expect(result).toEqual({
                 ...defaultResult,
-                id: 'TKABC',
-                subject: '🧀',
-                description: 'description',
-                category: 'category',
-                productId: 'PR123',
+                ticketId: 'TKABC',
+                ticketSubject: '🧀',
+                ticketDescription: 'description',
+                ticketCategory: 'category',
+                ticketProductId: 'PR123',
             });
         });
 
@@ -98,7 +105,7 @@ describe('SV plugin', () => {
 
             const result = executeRegisteredHook(SVPluginEventTypes.event, {});
 
-            expect(result).toEqual({...defaultResult, subject: '🧀', custom: {verycustom: 'value'}});
+            expect(result).toEqual({...defaultResult, ticketSubject: '🧀', ticketCustom: {verycustom: 'value'}});
         });
 
         it('should flush the ticket once they are sent', () => {
