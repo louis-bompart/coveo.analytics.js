@@ -2,6 +2,7 @@ import 'isomorphic-fetch';
 import * as fetchMock from 'fetch-mock';
 import {DefaultEventResponse} from '../src/events';
 import coveoua from '../src/coveoua/browser';
+import {changeDocumentLocation, getParsedBody} from './utils';
 
 describe('ec events', () => {
     const initialLocation = `${window.location}`;
@@ -44,13 +45,34 @@ describe('ec events', () => {
         coveoua('init', aToken, anEndpoint);
     });
 
+    it('should convert the application identifiers using the measurement protocol keys', async () => {
+        await coveoua('set', {
+            appName: 'some App Name',
+            appId: 'com.coveo.foo',
+            appVersion: '1.2.3',
+            appInstallerId: 'com.coveo.bar',
+        });
+
+        await coveoua('send', 'event');
+
+        const [body] = getParsedBody(fetchMock);
+        expect(body).toEqual({
+            ...defaultContextValues,
+            t: 'event',
+            an: 'some App Name',
+            aid: 'com.coveo.foo',
+            av: '1.2.3',
+            aiid: 'com.coveo.bar',
+        });
+    });
+
     it('can set custom data at the root level and send a page view event', async () => {
         await coveoua('set', 'custom', {
             verycustom: 'value',
         });
         await coveoua('send', 'pageview');
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(body).toEqual({
             ...defaultContextValues,
@@ -68,7 +90,7 @@ describe('ec events', () => {
         });
         await coveoua('send', 'pageview');
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(body).toEqual({
             ...defaultContextValues,
@@ -85,7 +107,7 @@ describe('ec events', () => {
         coveoua('ec:setAction', 'detail', {storeid: 'amazing'});
         await coveoua('send', 'pageview');
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(body).toEqual({
             ...defaultContextValues,
@@ -102,7 +124,7 @@ describe('ec events', () => {
         coveoua('ec:setAction', 'detail', {storeid: 'amazing', custom: {verycustom: 'value'}});
         await coveoua('send', 'pageview');
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(body).toEqual({
             ...defaultContextValues,
@@ -121,7 +143,7 @@ describe('ec events', () => {
             location: 'http://right.here',
         });
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(body).toEqual({
             ...defaultContextValues,
@@ -141,7 +163,7 @@ describe('ec events', () => {
             },
         });
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(body).toEqual({
             ...defaultContextValues,
@@ -161,7 +183,9 @@ describe('ec events', () => {
         await coveoua('send', 'pageview');
         await coveoua('send', 'event');
 
-        const [event, secondEvent, pageView, thirdEvent, secondPageView, afterSecondPageView] = getParsedBody();
+        const [event, secondEvent, pageView, thirdEvent, secondPageView, afterSecondPageView] = getParsedBody(
+            fetchMock
+        );
 
         [event, secondEvent, pageView, thirdEvent, secondPageView, afterSecondPageView]
             .map((e) => e.pid)
@@ -183,7 +207,7 @@ describe('ec events', () => {
         await coveoua('send', 'pageview');
         await coveoua('send', 'event', '2');
 
-        const [pageView, afterFirst, secondPageView, afterSecond] = getParsedBody();
+        const [pageView, afterFirst, secondPageView, afterSecond] = getParsedBody(fetchMock);
 
         expect(pageView.dl).toBe(initialLocation);
         expect(pageView.dr).toBe(document.referrer);
@@ -200,7 +224,7 @@ describe('ec events', () => {
         await coveoua('send', 'pageview', '/page');
         await coveoua('send', 'event', '1');
 
-        const [event, secondEvent] = getParsedBody();
+        const [event, secondEvent] = getParsedBody(fetchMock);
 
         expect(event.dl).toBe(`${initialLocation}page`);
         expect(secondEvent.dl).toBe(`${initialLocation}page`);
@@ -209,7 +233,7 @@ describe('ec events', () => {
     it('should keep the current location when a pageview is sent with the page parameter', async () => {
         await coveoua('send', 'pageview', '/page');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event.dl).toBe(`${initialLocation}page`);
     });
@@ -219,7 +243,7 @@ describe('ec events', () => {
         await coveoua('set', 'userId', aUser);
         await coveoua('send', 'pageview');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event).toEqual({
             ...defaultContextValues,
@@ -237,7 +261,7 @@ describe('ec events', () => {
             it('should set userId to anonymous', async () => {
                 await coveoua('send', 'pageview');
 
-                const [event] = getParsedBody();
+                const [event] = getParsedBody(fetchMock);
 
                 expect(event).toEqual({
                     ...defaultContextValues,
@@ -250,7 +274,7 @@ describe('ec events', () => {
                 await coveoua('set', 'userId', aUser);
                 await coveoua('send', 'pageview');
 
-                const [event] = getParsedBody();
+                const [event] = getParsedBody(fetchMock);
 
                 expect(event).toEqual({
                     ...defaultContextValues,
@@ -273,7 +297,7 @@ describe('ec events', () => {
             it('should not set the user id', async () => {
                 await coveoua('send', 'pageview');
 
-                const [event] = getParsedBody();
+                const [event] = getParsedBody(fetchMock);
 
                 expect(Object.keys(event)).not.toContain('uid');
             });
@@ -282,7 +306,7 @@ describe('ec events', () => {
                 await coveoua('set', 'userId', steveJobs);
                 await coveoua('send', 'pageview');
 
-                const [event] = getParsedBody();
+                const [event] = getParsedBody(fetchMock);
 
                 expect(event).toEqual({
                     ...defaultContextValues,
@@ -297,7 +321,7 @@ describe('ec events', () => {
         await coveoua('set', 'anonymizeIp', true);
         await coveoua('send', 'pageview');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event).toEqual({
             ...defaultContextValues,
@@ -310,7 +334,7 @@ describe('ec events', () => {
         await coveoua('set', 'anonymizeIp', 'true');
         await coveoua('send', 'pageview');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event).toEqual({
             ...defaultContextValues,
@@ -323,7 +347,7 @@ describe('ec events', () => {
         await coveoua('set', 'anonymizeIp', false);
         await coveoua('send', 'pageview');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event).toEqual({
             ...defaultContextValues,
@@ -335,7 +359,7 @@ describe('ec events', () => {
         await coveoua('set', 'anonymizeIp');
         await coveoua('send', 'pageview');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event).toEqual({
             ...defaultContextValues,
@@ -347,7 +371,7 @@ describe('ec events', () => {
         await coveoua('set', 'anonymizeIp', 'pôtato');
         await coveoua('send', 'pageview');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event).toEqual({
             ...defaultContextValues,
@@ -360,7 +384,7 @@ describe('ec events', () => {
         await coveoua('set', 'unknownParam', 'unknown');
         await coveoua('send', 'pageview');
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(Object.keys(body)).not.toContain('unknownParam');
     });
@@ -369,7 +393,7 @@ describe('ec events', () => {
         await coveoua('ec:addProduct', {name: 'wow', id: 'something', brand: 'brand', unknown: 'ok'});
         await coveoua('send', 'pageview');
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(Object.keys(body)).not.toContain('pr1unknown');
     });
@@ -379,7 +403,7 @@ describe('ec events', () => {
         await coveoua('ec:addProduct', partialProduct);
         await coveoua('send', 'pageview');
 
-        const [body] = getParsedBody();
+        const [body] = getParsedBody(fetchMock);
 
         expect(body).toEqual({
             ...defaultContextValues,
@@ -405,7 +429,7 @@ describe('ec events', () => {
         await coveoua('ec:setAction', 'add');
         await coveoua('send', 'event', 'UX', 'click', 'add to cart');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         // Event directly extracted from `ca.js` with the same sequence of event.
         expect(event).toEqual({
@@ -464,7 +488,7 @@ describe('ec events', () => {
         await coveoua('ec:addImpression', productImpression2);
         await coveoua('send', 'pageview');
 
-        const [event] = getParsedBody();
+        const [event] = getParsedBody(fetchMock);
 
         expect(event).toEqual({
             pid: expect.stringMatching(guidFormat),
@@ -495,15 +519,4 @@ describe('ec events', () => {
             z: expect.stringMatching(guidFormat),
         });
     });
-
-    const getParsedBody = (): any[] => {
-        return fetchMock.calls().map(([, {body}]) => JSON.parse(body.toString()));
-    };
-
-    const changeDocumentLocation = (url: string) => {
-        delete window.location;
-        // @ts-ignore
-        // Ooommmpf... JSDOM does not support any form of navigation, so let's overwrite the whole thing 💥.
-        window.location = new URL(url);
-    };
 });
