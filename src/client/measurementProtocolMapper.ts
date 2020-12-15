@@ -1,3 +1,4 @@
+import {ApplicationData} from '../events';
 import {EC, Product, ImpressionList, BaseImpression} from '../plugins/ec';
 import {isTicketKey, svcActionsKeysMapping} from './coveoServiceMeasurementProtocolMapper';
 import {keysOf} from './utils';
@@ -58,6 +59,13 @@ const transactionActionsKeysMapping: {[name: string]: string} = {
     option: 'col',
 };
 
+const applicationDataKeysMapping: {[key in keyof Required<ApplicationData>]: string} = {
+    appName: 'an',
+    appId: 'aid',
+    appVersion: 'av',
+    appInstallerId: 'aiid',
+};
+
 type DefaultContextInformation = ReturnType<typeof EC.prototype.getDefaultContextInformation> &
     ReturnType<typeof EC.prototype.getLocationInformation>;
 const contextInformationMapping: {[key in keyof DefaultContextInformation]: string} = {
@@ -82,6 +90,7 @@ const measurementProtocolKeysMapping: {[name: string]: string} = {
     ...contextInformationMapping,
     ...globalParamKeysMapping,
     ...svcActionsKeysMapping,
+    ...applicationDataKeysMapping,
 };
 
 export const convertKeysToMeasurementProtocol = (params: any) => {

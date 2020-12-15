@@ -1,4 +1,4 @@
-import {AnyEventResponse, SendEventArguments, VariableArgumentsPayload} from '../events';
+import {AnyEventResponse, ApplicationData, SendEventArguments, VariableArgumentsPayload} from '../events';
 import {AnalyticsClient, CoveoAnalyticsClient, Endpoints} from '../client/analytics';
 import {Plugins} from './plugins';
 import {EC} from '../plugins/ec';
@@ -97,6 +97,12 @@ export class CoveoUA {
         this.client = undefined;
         this.plugins = new Plugins();
         this.params = {};
+    }
+
+    setApp(applicationData: ApplicationData): void {
+        for (const key of Object.keys(applicationData)) {
+            this.set(key, applicationData[key as keyof ApplicationData] as string);
+        }
     }
 }
 

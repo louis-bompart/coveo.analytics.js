@@ -118,3 +118,10 @@ export interface VisitResponse {
 export interface HealthResponse {
     status: string;
 }
+
+export interface ApplicationData {
+    appName: string;
+    appId?: string;
+    appVersion?: string;
+    appInstallerId?: string;
+}
