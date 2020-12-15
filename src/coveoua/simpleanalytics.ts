@@ -98,12 +98,6 @@ export class CoveoUA {
         this.plugins = new Plugins();
         this.params = {};
     }
-
-    setApp(applicationData: ApplicationData): void {
-        for (const key of Object.keys(applicationData)) {
-            this.set(key, applicationData[key as keyof ApplicationData] as string);
-        }
-    }
 }
 
 export const coveoua = new CoveoUA();
