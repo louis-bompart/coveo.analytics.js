@@ -1,3 +1,4 @@
 [submodule "src"]
 	path = src
 	url = https://github.com/louis-bompart/cats
+	branch = master
